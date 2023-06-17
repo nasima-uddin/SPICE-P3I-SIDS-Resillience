@@ -1,0 +1,69 @@
+title: "ND GAIN Data Exploration"
+author: "Nasima"
+date: "6/16/2023"
+output: html_document
+---
+
+Load Libraries
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)# allows us to cut out long file paths (ex. "users/connor/dowloads/etc")
+library(tidyverse) # allows us to do lots of fundamental data science tasks (ex. read_csv)
+library(ggcorrplot) # allows us to make correlation plots
+library(plotly) # allows us to make ggplot objects interactive
+library(janitor) # allows us to clean the column names of our dataframe
+```
+
+Read in our Data
+
+```{r} 
+nd_gain_data <- read_csv(here("data/nd-gain-data/joined_data/nd-gain-joined.csv"))
+
+```
+
+
+Round value column for two numbers after the decimal
+
+```{r}
+nd_gain_data$value <- round(nd_gain_data$value, digits = 2)
+```
+
+
+Select Year 
+
+```{r}
+nd_gain_data_2020 <- nd_gain_data %>% 
+  filter(year == 2020)
+```
+
+Pivot Wider
+
+```{r}
+nd_gain_data_2020_wider <- nd_gain_data_2020 %>% 
+  pivot_wider(names_from = indicator,
+              values_from = value)
+```
+
+
+
+
+
+Scatter Plot
+
+```{r}
+education_hdi_plot <- ggplot(data = nd_gain_data_2020_wider, aes(x = education,
+                                     y = human_development_index,
+                                     color = sids_context)) +
+  geom_point() +
+  geom_smooth() +
+  labs(title = "Education and Human Development Index, ND-GAIN 2020",
+       x = "education",
+       y = "human development index") +
+  theme_minimal()
+```
+
+
+```{r}
+ggplotly(education_hdi_plot)
+```
